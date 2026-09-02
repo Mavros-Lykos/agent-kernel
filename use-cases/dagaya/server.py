@@ -151,9 +151,34 @@ if __name__ == "__main__":
                         self._log.warning(f"Guardrail blocked message from {from_number}")
                         await self._send_message(from_number, blocked_reply, message_id)
                     return
+            else:
+                # Unsupported message type (audio, sticker, location, etc)
+                from_number = message.get("from")
+                message_id = message.get("id")
+                if from_number:
+                    await self._send_message(from_number, "Ado! I can only read text and images right now. Please type your message or send a photo! 😅", message_id)
+                return
 
             # If safe, let the normal Agent Kernel handler process it
             await super()._handle_message(message, value)
 
+    class FixedWhatsAppHandler(DagayaWhatsAppRequestHandler):
+        async def _send_message(self, to_number: str, text: str, reply_to_message_id: str = None):
+            # Programmatically inject mascot images at the absolute first line to guarantee they load
+            # based on LLM's response content, since LLMs sometimes ignore URL formatting rules.
+            if "ado" in text.lower() and "!" in text and "https://" not in text[:20]:
+                # He almost always greets with "Ado!" in the first few lines of a greeting
+                text = "https://ulfheonar.com/assets/dagaya/dagaya_wave.jpg?v=1\n" + text
+            elif ("?" in text) and ("think" in text.lower() or "why" in text.lower() or "how" in text.lower()) and "https://" not in text[:20]:
+                text = "https://ulfheonar.com/assets/dagaya/dagaya_thinking.jpg?v=1\n" + text
+            elif ("fact" in text.lower() or "mind-blowing" in text.lower()) and "https://" not in text[:20]:
+                text = "https://ulfheonar.com/assets/dagaya/dagaya_curious.jpg?v=1\n" + text
+            elif ("100%" in text or "3/3" in text or "excellent" in text.lower()) and "https://" not in text[:20]:
+                text = "https://ulfheonar.com/assets/dagaya/dagaya_celebrate.jpg?v=1\n" + text
+            elif ("0/3" in text or "1/3" in text or "don't worry" in text.lower()) and "https://" not in text[:20]:
+                text = "https://ulfheonar.com/assets/dagaya/dagaya_encourage.jpg?v=1\n" + text
+                
+            await super()._send_message(to_number, text, reply_to_message_id)
+
     print("Starting Dagaya WhatsApp Webhook Server...")
-    RESTAPI.run(handlers=[DagayaWhatsAppRequestHandler()])
+    RESTAPI.run(handlers=[FixedWhatsAppHandler()])
