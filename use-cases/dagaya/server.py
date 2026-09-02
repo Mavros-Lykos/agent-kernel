@@ -164,21 +164,40 @@ if __name__ == "__main__":
 
     class FixedWhatsAppHandler(DagayaWhatsAppRequestHandler):
         async def _send_message(self, to_number: str, text: str, reply_to_message_id: str = None):
+            import asyncio
+            
+            image_url = None
             # Programmatically inject mascot images at the absolute first line to guarantee they load
             # based on LLM's response content, since LLMs sometimes ignore URL formatting rules.
             if "ado" in text.lower() and "!" in text and "https://" not in text[:20]:
-                # He almost always greets with "Ado!" in the first few lines of a greeting
-                text = "https://ulfheonar.com/assets/dagaya/dagaya_wave.jpg?v=1\n" + text
+                image_url = "https://ulfheonar.com/assets/dagaya/dagaya_wave.jpg?v=1"
             elif ("?" in text) and ("think" in text.lower() or "why" in text.lower() or "how" in text.lower()) and "https://" not in text[:20]:
-                text = "https://ulfheonar.com/assets/dagaya/dagaya_thinking.jpg?v=1\n" + text
+                image_url = "https://ulfheonar.com/assets/dagaya/dagaya_thinking.jpg?v=1"
             elif ("fact" in text.lower() or "mind-blowing" in text.lower()) and "https://" not in text[:20]:
-                text = "https://ulfheonar.com/assets/dagaya/dagaya_curious.jpg?v=1\n" + text
+                image_url = "https://ulfheonar.com/assets/dagaya/dagaya_curious.jpg?v=1"
             elif ("100%" in text or "3/3" in text or "excellent" in text.lower()) and "https://" not in text[:20]:
-                text = "https://ulfheonar.com/assets/dagaya/dagaya_celebrate.jpg?v=1\n" + text
+                image_url = "https://ulfheonar.com/assets/dagaya/dagaya_celebrate.jpg?v=1"
             elif ("0/3" in text or "1/3" in text or "don't worry" in text.lower()) and "https://" not in text[:20]:
-                text = "https://ulfheonar.com/assets/dagaya/dagaya_encourage.jpg?v=1\n" + text
+                image_url = "https://ulfheonar.com/assets/dagaya/dagaya_encourage.jpg?v=1"
                 
-            await super()._send_message(to_number, text, reply_to_message_id)
+            # Also handle if the LLM *did* properly include the image URL at the start
+            if not image_url and text.strip().startswith("http"):
+                lines = text.strip().split("\n")
+                image_url = lines[0].strip()
+                text = "\n".join(lines[1:]).strip()
+
+            if image_url:
+                # Send the image first on its own
+                await super()._send_message(to_number, image_url, reply_to_message_id)
+                # Wait 1.5 seconds so WhatsApp Cloud API finishes processing the media 
+                # before we send the text, ensuring perfect chronological delivery!
+                await asyncio.sleep(1.5)
+                # Send the rest of the text without replying to the same message again
+                if text.strip():
+                    await super()._send_message(to_number, text.strip(), None)
+            else:
+                # Just send text normally
+                await super()._send_message(to_number, text, reply_to_message_id)
 
     print("Starting Dagaya WhatsApp Webhook Server...")
     RESTAPI.run(handlers=[FixedWhatsAppHandler()])
