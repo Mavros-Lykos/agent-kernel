@@ -80,9 +80,9 @@ Dagaya is a sophisticated multi-agent system built entirely upon the open-source
 
 ### Multi-Agent Flow (Architecture Diagram)
 
-Dagaya utilizes a specialized "Triage" agent to intelligently route user intents to the correct sub-agent, preventing hallucination and ensuring specialized responses.
+The Hub-and-Spoke model ensures users never get stuck in infinite loops, and tools are strictly isolated to the agents that need them.
 
-![Architecture Diagram](architecture.png)
+![Architecture Diagram](assets/architecture.png)
 
 ---
 
