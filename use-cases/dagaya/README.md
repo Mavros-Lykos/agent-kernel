@@ -8,14 +8,9 @@
 
   <img src="https://ulfheonar.com/Emberwolves.png?v=1" alt="Team EMBERWOLVES Logo" width="150" />
   
-  <h3>IDEALIZE 2026 Mini-Competition Submission by Team EMBERWOLVES</h3>
+  <h3>Built by Team EMBERWOLVES</h3>
   
-**Team Lead**: Charaka Hashan ([@Mavros-Lykos](https://github.com/Mavros-Lykos))<br>
-**Team Member**: Malisha Dilanjana ([@malishadilanjana](https://github.com/malishadilanjana))<br>
-**Team Member**: Chavindu Nirmal ([@Chvi2005](https://github.com/Chvi2005))<br>
-**Team Member**: Osada Gaya Suraweera ([@Oska219](https://github.com/Oska219))<br>
-**Team Member**: Shakya Kariyawasam ([@shasha628](https://github.com/shasha628))
-
+  **Contributors**: [@Mavros-Lykos](https://github.com/Mavros-Lykos) &bull; [@malishadilanjana](https://github.com/malishadilanjana) &bull; [@Chvi2005](https://github.com/Chvi2005) &bull; [@Oska219](https://github.com/Oska219) &bull; [@shasha628](https://github.com/shasha628)
   
   <br>
 
